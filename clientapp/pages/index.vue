@@ -1,0 +1,1 @@
+<template><h1 class="text-2xl font-bold">BuggyFilter Client</h1><p>Welcome to the AI Bug Reporting system.</p></template>
