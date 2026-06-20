@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { TriageService } from './triage.service';
-import { TriageController } from './triage.controller';
+import { TriageService } from './service/triage.service';
+import { TriageController } from './controller/triage.controller';
 
 @Module({
   imports: [],

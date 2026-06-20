@@ -1,5 +1,5 @@
 import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
-import { TriageService, TriageResult } from './triage.service';
+import { TriageService, TriageResult } from '../service/triage.service';
 
 interface TriageRequest {
   owner: string;
