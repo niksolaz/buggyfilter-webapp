@@ -2,6 +2,20 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 # ==========================================
+# 6. ORGANIZATION MODEL (For Multi-Tenant Support)
+# ==========================================
+class Organization(models.Model):
+    """
+    Rappresenta la Software House o l'Azienda.
+    L'unità di isolamento principale del SaaS.
+    """
+    name = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    # Qui in futuro potremmo aggiungere campi come 'plan' (Free, Pro) o 'subscription_id'
+
+    def __str__(self):
+        return self.name
+# ==========================================
 # 1. USER MODEL (Custom)
 # ==========================================
 class User(AbstractUser):
@@ -12,8 +26,20 @@ class User(AbstractUser):
     ]
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='CLIENT')
 
+    # NUOVA RIGA: Ogni utente appartiene a un'organizzazione.
+    # null=True perché un cliente potrebbe non essere legato a un'organizzazione
+    # ma solo a un progetto specifico, o l'owner creato inizialmente.
+    organization = models.ForeignKey(
+        Organization,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='members'
+    )
+
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"
+
 
 # ==========================================
 # 2. PROJECT MODEL
