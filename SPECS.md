@@ -1,5 +1,7 @@
 # Project Specifications: BuggyFilter WebApp
 
+> **AGGIORNAMENTO 2026-06-26** — Stack backend allineato al codice reale: **Django + Django Ninja** (non Nest.js). Razionale e alternative in `ENGINEERING.md`; design in `DESIGN_SYSTEM.md`.
+
 ## 1. Overview
 BuggyFilter is an AI-augmented bug tracking system designed to bridge the gap between end-users (clients) and technical operators. The core innovation is an LLM-driven intermediary that triages tickets by analyzing the codebase, interviewing the client, and providing operators with a pre-analyzed technical brief.
 
@@ -44,24 +46,31 @@ $\downarrow$
 
 ## 4. Technical Architecture
 
-### Frontend (Vue 3 + Nuxt 4)
+### Frontend (Vue 3 + Nuxt 3)
 - **Client Portal**: Simple, chat-centric UI. No access to administrative dashboards.
 - **Operator Dashboard**: Kanban-style board for managing ticket states and reviewing AI briefs.
 - **State Management**: Pinia for real-time ticket updates.
+- **Real-time**: subscribe to **Supabase Realtime** for chat/ticket updates (no custom WebSocket).
+- Design tokens, components and field-level UI pattern: see `DESIGN_SYSTEM.md`.
 
-### Backend (Node.js, TypeScript, Nest.js)
-- **API Layer**: REST/WebSocket for real-time chat and ticket updates.
-- **LLM Integration**: Service layer to handle prompts and context injection (including codebase snippets from GitHub).
-- **GitHub Integration**: Octokit for repository indexing and searching.
-- **Auth**: JWT-based authentication with role-based access control (RBAC).
+### Backend (Python, Django 6 + Django Ninja)
+- **API Layer**: REST (Django Ninja, typed con Pydantic). Triage AI eseguito in **worker asincrono** (non in request sincrona).
+- **LLM Integration**: service layer in Python per prompt + context injection (snippet codebase da GitHub).
+- **GitHub Integration**: **PyGithub** per indicizzazione/ricerca repository.
+- **Auth**: JWT + RBAC. Una sola sorgente identità (Django auth, `AbstractUser` custom) — NON Supabase Auth in parallelo.
+- **Field-level security**: schema Ninja distinti per ruolo (`TicketClientOut` senza campi tecnici / `TicketOperatorOut` completo).
+- **Admin SaaS (MVP)**: **Django Admin** per gestione tenant/utenti/progetti/piani.
 
-### Database (PostgreSQL via Supabase)
-- **Tables**:
-  - `users`: id, email, role (client/operator).
+### Database (PostgreSQL via Supabase — Django ORM)
+- Supabase usato come **Postgres gestito + Realtime**. ⚠️ Migration sulla porta **5432** (session), runtime sul **6543** (pooler pgBouncer).
+- **Tabelle implementate** (`serverapp/tickets/models.py`):
+  - `organizations`: id, name, created_at. *(unità di isolamento multi-tenant)*
+  - `users` (custom): id, ..., role (CLIENT/OPERATOR/OWNER), organization_id (FK nullable).
   - `projects`: id, name, description, created_at.
-  - `project_members`: id, project_id, user_id, role_in_project (owner/operator/client).
-  - `tickets`: id, project_id, client_id, operator_id, status, severity, estimated_hours, ai_solution, created_at, updated_at.
-  - `messages`: id, ticket_id, sender_id (client/ai/operator), content, timestamp.
+  - `project_members`: id, project_id, user_id, role_in_project (unique project+user), joined_at.
+  - `tickets`: id, project_id, client_id, operator_id (nullable), title, description, status, severity (nullable), estimated_hours, ai_solution, created_at, updated_at.
+  - `messages`: id, ticket_id, sender_id, content, timestamp.
+- **Proposte non ancora a codice** (vedi `ER_ANALYSIS.md`): `plans` (billing/quota/BYOK), `projects.github_url`/`github_token`, `messages.ai_agent_id`.
 
 ### DevOps
 - **CI/CD**: GitHub Actions for automated testing and deployment.

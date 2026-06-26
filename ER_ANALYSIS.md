@@ -1,5 +1,20 @@
 # Data Requirements & ER Analysis: BuggyFilter WebApp
 
+> **AGGIORNAMENTO 2026-06-26** — Questo documento è un modello **target/proposto**. Lo schema **realmente implementato** in `serverapp/tickets/models.py` differisce su alcuni punti (vedi §0). Stack: Django + Django Ninja su Supabase Postgres (dettagli in `ENGINEERING.md`).
+
+## 0. Implementato vs Proposto
+| Entità / campo | Stato |
+|---|---|
+| `Organization` (multi-tenant) | ✅ Implementato *(non era in questo ERD)* |
+| `User` con `role` + FK `organization` | ✅ Implementato come custom `AbstractUser` (non c'è split `AUTH_USER`/`USER`: Django gestisce l'auth nello stesso modello) |
+| `Project`, `ProjectMember`, `Ticket`, `Message` | ✅ Implementati |
+| `Project.github_url` / `github_token` | ⏳ Proposto, non a codice |
+| `Message.ai_agent_id` (dual sender) | ⏳ Proposto, non a codice (oggi solo `sender`) |
+| `PLAN` (billing/quota/BYOK) | ⏳ Proposto, non a codice |
+| Decoupling `AUTH_USER`/`USER` (pattern Supabase) | ❌ Non adottato: con Django auth la separazione non serve |
+
+> Nota auth: l'ERD sotto ipotizzava il pattern Supabase con `AUTH_USER` separato. Poiché il backend usa **Django auth** (una sola sorgente identità), quel decoupling è superfluo per l'MVP. Mantenere il modello sotto come riferimento per le entità **proposte** (specie `PLAN`).
+
 ## 1. Goal
 The objective is to establish a robust conceptual data model that supports the AI-augmented triage process, ensuring strict data isolation between Clients and Operators while allowing for multi-tenant project management and a SaaS subscription model.
 

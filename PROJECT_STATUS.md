@@ -1,21 +1,26 @@
 # BuggyFilter WebApp - Project Status & Decisions
 
+> **AGGIORNAMENTO 2026-06-26** — Stato riallineato al codice reale. Lo stack backend è **Django + Django Ninja** (non Nest.js); il Triage Engine descritto in precedenza era su un'iterazione Nest.js **non presente** nel codice Django attuale. Decisioni consolidate in `ENGINEERING.md` e `DESIGN_SYSTEM.md`.
+
 ## 📌 Vision
 BuggyFilter è un sistema di bug tracking potenziato dall'AI che agisce come intermediario tra clienti e operatori tecnici, automatizzando il triage dei ticket tramite l'analisi del codice sorgente su GitHub.
 
 ---
 
 ## 🛠️ Stato Attuale dello Sviluppo
-Il progetto è in fase iniziale. È stata completata la **Fase 1 (Triage Engine)**.
+Il progetto è in fase iniziale. È stato fatto un **pivot di stack** da Nest.js a **Django + Django Ninja**.
 
-### ✅ Implementato (ServerApp)
-- **Triage Engine**: Sistema funzionale che integra GitHub API (Octokit) e LLM (OpenAI).
-- **Flusso di Analisi**: Il sistema è in grado di:
-  1. Ricevere un report di bug.
-  2. Cercare file rilevanti nel repository GitHub.
-  3. Generare un brief tecnico con Severità, Ore Stimate, Soluzione suggerita e Operatore Target.
-- **API Endpoint**: Implementato `POST /triage` per l'invio e il processamento dei bug.
-- **Infrastructure**: Setup di Nest.js con gestione variabili d'ambiente via `.env`.
+### ✅ Implementato (ServerApp — Django)
+- **Modelli dati**: `Organization`, `User` (custom AbstractUser con ruoli), `Project`, `ProjectMember`, `Ticket`, `Message`. Migrazioni applicate (2 migration).
+- **Infrastructure**: Setup Django 6.0.6 + Django Ninja 1.6.2, connessione a **Supabase Postgres** via `.env`, `AUTH_USER_MODEL` custom.
+
+### ⏳ Da implementare (non ancora nel codice)
+- **API endpoints** Ninja (le view sono ancora placeholder `Hello world`).
+- **Triage Engine** (PyGithub + OpenAI): la logica descritta nella precedente iterazione Nest.js va **ricostruita in Python** e spostata in un **worker asincrono**.
+- **Auth/JWT + RBAC** e isolamento field-level via schema Ninja per ruolo.
+
+### 📌 Nota di portabilità
+Il Triage Engine (regola 3 domande, output Severità/Ore/Soluzione/Operatore, modello ibrido API key) resta valido come **specifica logica** — cambia solo il linguaggio di implementazione (Python invece di TypeScript). Le regole di business sotto restano in vigore.
 
 ---
 
@@ -37,17 +42,19 @@ Il progetto è in fase iniziale. È stata completata la **Fase 1 (Triage Engine)
 ---
 
 ## 🚀 Roadmap Prossimi Passi
+> Piano MVP 3-4 settimane dettagliato in `ENGINEERING.md` §6.
 
-### Fase 2: Data Persistence & Infrastructure (Prossimo Step)
-- [ ] Setup di **Supabase (PostgreSQL)**.
-- [ ] Creazione tabelle: `users`, `projects`, `tickets`, `messages`.
-- [ ] Implementazione del persistente per il contatore di domande (interaction count).
-- [ ] Salvataggio automatico dei risultati del triage nel DB.
+### ✅ Fase 2: Data Persistence (parzialmente fatta)
+- [x] Setup **Supabase (PostgreSQL)** + modelli Django migrati.
+- [ ] Correggere connessione migration sulla porta **5432** (il `.env` punta al pooler **6543**).
+- [ ] Persistenza contatore domande (interaction count) e salvataggio risultati triage.
 
-### Fase 3: Auth & RBAC
-- [ ] Implementazione JWT.
-- [ ] Controllo accessi: i Client NON devono vedere i campi tecnici del triage (severità, ore, soluzione AI).
+### Fase 3: API + Triage AI (Django)
+- [ ] API Ninja: tickets/messages CRUD con schema per ruolo.
+- [ ] `TriageService` Python (PyGithub + OpenAI) in **worker async** (django-q2 / RQ).
+- [ ] Auth JWT + RBAC; i Client NON vedono severità/ore/soluzione AI.
 
 ### Fase 4: Real-time & UI
-- [ ] Sviluppo della `clientapp` (Vue 3 + Nuxt 4).
-- [ ] Integrazione WebSocket per chat in tempo reale.
+- [ ] Sviluppo della `clientapp` (Vue 3 + **Nuxt 3**): Chat client + Kanban operatore (vedi `DESIGN_SYSTEM.md`).
+- [ ] Chat in tempo reale via **Supabase Realtime** (no WebSocket custom da costruire).
+- [ ] Admin: usare **Django Admin** per l'MVP invece di una UI custom.
