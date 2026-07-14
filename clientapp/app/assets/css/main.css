@@ -1,0 +1,59 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+/*
+ * Design token BuggyFilter — fonte: DOCS/BUGGYFILTER_DESIGN_SYSTEM.md §1.
+ * I token sono CSS custom properties così da restare identici quando
+ * il tema Nuxt UI verrà esteso o sostituito.
+ */
+@theme {
+  /* Tipografia (caricata da @nuxt/fonts via queste dichiarazioni) */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+:root {
+  /* Brand */
+  --color-brand-600: #4F46E5;
+  --color-brand-500: #6366F1;
+  --color-brand-50: #EEF0FF;
+
+  /* Semantici */
+  --color-success: #16A34A;
+  --color-warning: #D97706;
+  --color-info: #2563EB;
+  --color-danger: #DC2626;
+
+  /* Severità — SOLO superfici Operator/Admin (mai nel Client Portal) */
+  --sev-critical: #DC2626;
+  --sev-high: #EA580C;
+  --sev-medium: #D97706;
+  --sev-low: #65A30D;
+
+  /* Neutrali */
+  --color-bg: #FFFFFF;
+  --color-surface: #F8FAFC;
+  --color-border: #E2E8F0;
+  --color-text: #0F172A;
+  --color-text-muted: #64748B;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+}
+
+/* Stati drag del Kanban (design doc §2.5) */
+.bf-drag-ghost {
+  opacity: 0.4;
+}
+
+.bf-drag-active {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  transform: rotate(2deg);
+}
