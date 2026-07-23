@@ -47,8 +47,8 @@ const chartData = computed(() => ({
     {
       label: 'Bug aperti',
       data: trend.value.created,
-      borderColor: '#4F46E5',
-      backgroundColor: 'rgba(79, 70, 229, 0.08)',
+      borderColor: '#DC2626',
+      backgroundColor: 'rgba(220, 38, 38, 0.08)',
       fill: true,
       tension: 0.35,
       pointRadius: 2,

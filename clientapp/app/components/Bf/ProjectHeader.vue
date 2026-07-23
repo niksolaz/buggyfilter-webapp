@@ -39,7 +39,7 @@ const tabs = computed(() => [
         :key="tab.to"
         :to="tab.to"
         class="-mb-px inline-flex items-center gap-1.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
-        exact-active-class="border-[var(--color-brand-600)]! text-[var(--color-brand-600)]!"
+        exact-active-class="border-brand-600! text-brand-600!"
       >
         <UIcon
           :name="tab.icon"

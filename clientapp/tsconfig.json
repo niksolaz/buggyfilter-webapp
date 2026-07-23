@@ -1,0 +1,11 @@
+{
+  // Tsconfig radice: rimanda ai tsconfig generati da Nuxt in .nuxt/
+  // (rigenerati automaticamente da `nuxt prepare` / `nuxt dev`).
+  "files": [],
+  "references": [
+    { "path": "./.nuxt/tsconfig.app.json" },
+    { "path": "./.nuxt/tsconfig.server.json" },
+    { "path": "./.nuxt/tsconfig.shared.json" },
+    { "path": "./.nuxt/tsconfig.node.json" }
+  ]
+}

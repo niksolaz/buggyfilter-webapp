@@ -145,7 +145,7 @@ async function submit() {
       Hai già un account?
       <NuxtLink
         to="/login"
-        class="font-medium text-[var(--color-brand-600)] hover:underline"
+        class="font-medium text-brand-600 hover:underline"
       >
         Accedi
       </NuxtLink>

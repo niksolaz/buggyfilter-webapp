@@ -37,9 +37,9 @@ await Promise.all([projectsStore.fetchAll(), ticketsStore.fetchAll()])
         v-for="project in projectsStore.projects"
         :key="project.id"
         :to="`/projects/${project.id}`"
-        class="group rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg)] p-5 shadow-sm transition hover:border-[var(--color-brand-500)] hover:shadow-md"
+        class="group rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg)] p-5 shadow-sm transition hover:border-brand-500 hover:shadow-md"
       >
-        <h2 class="font-semibold text-[var(--color-text)] group-hover:text-[var(--color-brand-600)]">
+        <h2 class="font-semibold text-[var(--color-text)] group-hover:text-brand-600">
           {{ project.name }}
         </h2>
         <p class="mt-1 line-clamp-2 text-sm text-[var(--color-text-muted)]">

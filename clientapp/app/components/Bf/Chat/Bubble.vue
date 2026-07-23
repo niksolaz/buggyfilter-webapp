@@ -27,8 +27,8 @@ const senderLabel = computed(() => ({
     <div
       class="max-w-[80%] rounded-[var(--radius-lg)] px-4 py-2.5 text-sm leading-relaxed"
       :class="{
-        'bg-[var(--color-brand-600)] text-white': item.sender === 'client',
-        'bg-[var(--color-brand-50)] text-[var(--color-text)]': item.sender === 'bot',
+        'bg-brand-600 text-white': item.sender === 'client',
+        'bg-brand-50 text-[var(--color-text)]': item.sender === 'bot',
         'bg-[var(--color-surface)] text-[var(--color-text)]': item.sender === 'operator',
       }"
     >
