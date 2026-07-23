@@ -41,11 +41,11 @@ watch(
       class="flex justify-start"
       aria-label="L'assistente sta scrivendo"
     >
-      <div class="flex items-center gap-1 rounded-[var(--radius-lg)] bg-[var(--color-brand-50)] px-4 py-3">
+      <div class="flex items-center gap-1 rounded-[var(--radius-lg)] bg-brand-50 px-4 py-3">
         <span
           v-for="dot in 3"
           :key="dot"
-          class="size-1.5 animate-bounce rounded-full bg-[var(--color-brand-500)]"
+          class="size-1.5 animate-bounce rounded-full bg-brand-500"
           :style="{ animationDelay: `${(dot - 1) * 150}ms` }"
         />
       </div>

@@ -49,7 +49,7 @@ const moveItems = computed(() =>
   <!-- ═══ Variante OPERATOR: densa, con campi tecnici ═══ -->
   <article
     v-if="operatorTicket"
-    class="group rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-bg)] p-3 shadow-sm transition hover:border-[var(--color-brand-500)] hover:shadow-md"
+    class="group rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-bg)] p-3 shadow-sm transition hover:border-brand-500 hover:shadow-md"
   >
     <div class="flex items-start justify-between gap-2">
       <h3 class="text-sm font-semibold leading-snug text-[var(--color-text)]">
@@ -105,7 +105,7 @@ const moveItems = computed(() =>
     <!-- Brief AI (nascosto nella versione compact per non appesantire il Kanban) -->
     <div
       v-if="!compact && operatorTicket.ai_solution"
-      class="mt-2 rounded-[var(--radius-sm)] bg-[var(--color-brand-50)] p-2 font-mono text-xs leading-relaxed text-[var(--color-text)]"
+      class="mt-2 rounded-[var(--radius-sm)] bg-brand-50 p-2 font-mono text-xs leading-relaxed text-[var(--color-text)]"
     >
       <span class="font-sans font-semibold">🤖 Brief AI</span><br>
       {{ operatorTicket.ai_solution }}

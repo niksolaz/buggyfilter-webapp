@@ -1,14 +1,17 @@
 <script setup lang="ts">
-/** Layout auth: card centrata su sfondo brand tenue. */
+  /** Layout auth: card centrata su sfondo brand tenue. */
 </script>
 
 <template>
-  <main class="flex min-h-screen items-center justify-center bg-[var(--color-brand-50)] p-4">
+  <main class="flex min-h-screen items-center justify-center bg-brand-50 p-4">
     <div class="w-full max-w-md">
       <div class="mb-6 text-center">
-        <h1 class="text-2xl font-bold text-[var(--color-text)]">
-          🐞 BuggyFilter
-        </h1>
+        <div class="flex items-center justify-center gap-2 w-full py-6">
+          <div class="flex items-center justify-center size-12 border border-red-600 rounded-full bg-red-600">
+            <span class="text-4xl text-white font-bold">B</span>
+          </div>
+          <span class="font-bold text-4xl text-red-600 tracking-tight">BuggyFilter</span>
+        </div>
         <p class="mt-1 text-sm text-[var(--color-text-muted)]">
           Segnalazione e triage intelligente dei bug
         </p>

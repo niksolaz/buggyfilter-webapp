@@ -8,6 +8,15 @@ export default defineNuxtConfig({
   // Evita problemi SSR con localStorage (sessione), drag&drop e Chart.js.
   ssr: false,
 
+  app: {
+    head: {
+      link: [
+        // Favicon servita da public/favicon.ico
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      ],
+    },
+  },
+
   css: ['~/assets/css/main.css'],
   compatibilityDate: '2026-07-14',
 
