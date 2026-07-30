@@ -21,10 +21,10 @@
       <div class="border-b border-[var(--color-border)] p-4">
         <NuxtLink to="/operator" class="text-lg font-bold text-[var(--color-text)]">
           <div class="flex items-center gap-2 py-3">
-            <div class="flex items-center justify-center size-6 border border-red-600 rounded-full bg-red-600">
+            <div class="flex items-center justify-center size-6 border border-brand-500 rounded-full bg-brand-500">
               <span class="text-sm text-white font-bold">B</span>
             </div>
-            <span class="font-bold text-base text-red-600 tracking-tight">BuggyFilter</span>
+            <span class="font-bold text-base text-brand-500 tracking-tight">BuggyFilter</span>
           </div>
         </NuxtLink>
         <p class="text-xs text-[var(--color-text-muted)]">
@@ -53,17 +53,18 @@
 
       <div class="border-t border-[var(--color-border)] p-3">
         <div class="flex items-center gap-2 px-2">
-          <UAvatar :alt="auth.user ? fullName(auth.user) : ''" size="sm" />
+          <UAvatar :alt="auth.user ? fullName(auth.user) : ''" size="sm" class="bg-brand-50"
+            :ui="{ fallback: 'text-brand-600' }" />
           <div class="min-w-0 flex-1">
-            <p class="truncate text-sm font-medium text-[var(--color-text)]">
+            <p class="truncate text-sm font-medium text-[var(--color-brand-600)]">
               {{ auth.user ? fullName(auth.user) : '' }}
             </p>
-            <p class="text-xs text-[var(--color-text-muted)]">
+            <p class="text-xs text-[var(--color-brand-500)]">
               {{ auth.user?.role === 'OWNER' ? 'Owner' : 'Operatore' }}
             </p>
           </div>
           <UButton icon="i-lucide-log-out" color="neutral" variant="ghost" size="sm" aria-label="Esci"
-            @click="logout" />
+            class="text-brand-600" @click="logout" />
         </div>
       </div>
     </aside>

@@ -17,19 +17,24 @@
       <div class="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
         <NuxtLink to="/client" class="text-lg font-bold text-[var(--color-text)]">
           <div class="flex items-center gap-2 py-3">
-            <div class="flex items-center justify-center size-6 border border-red-600 rounded-full bg-red-600">
+            <div class="flex items-center justify-center size-6 border border-brand-500 rounded-full bg-brand-500">
               <span class="text-sm text-white font-bold">B</span>
             </div>
-            <span class="font-bold text-base text-red-600 tracking-tight">BuggyFilter</span>
+            <span class="font-bold text-base text-brand-500 tracking-tight">BuggyFilter</span>
           </div>
         </NuxtLink>
         <div class="flex items-center gap-3">
-          <span class="hidden text-sm text-[var(--color-text-muted)] sm:inline">
+          <span class="hidden text-sm text-[var(--color-brand-600)] sm:inline">
             {{ auth.user ? fullName(auth.user) : '' }}
           </span>
-          <UAvatar :alt="auth.user ? fullName(auth.user) : ''" size="sm" />
+          <UAvatar
+            :alt="auth.user ? fullName(auth.user) : ''"
+            size="sm"
+            class="bg-brand-50"
+            :ui="{ fallback: 'text-brand-600' }"
+          />
           <UButton icon="i-lucide-log-out" color="neutral" variant="ghost" size="sm" aria-label="Esci"
-            @click="logout" />
+            class="text-brand-600" @click="logout" />
         </div>
       </div>
     </header>
