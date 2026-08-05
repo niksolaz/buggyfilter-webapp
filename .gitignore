@@ -11,3 +11,6 @@ DOCS/
 # Logs
 logs/
 *.log
+
+# AI
+.claude/
