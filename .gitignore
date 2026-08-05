@@ -13,4 +13,4 @@ logs/
 *.log
 
 # AI
-.claude/
+.claude
