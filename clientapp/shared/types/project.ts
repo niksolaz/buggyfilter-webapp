@@ -9,6 +9,14 @@ export interface Project {
   created_at: string
 }
 
+/** Dati raccolti dal form di creazione progetto. */
+export interface NewProjectInput {
+  name: string
+  description: string
+  /** Tariffa giornaliera iniziale (finisce in ProjectSettings, non su Project). */
+  daily_rate: number
+}
+
 /** Ruolo del membro all'interno del singolo progetto (ProjectMember.role_in_project). */
 export type ProjectRole = 'ADMIN' | 'MEMBER' | 'VIEWER'
 

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { projectsService } from '~/services'
-import type { Project, ProjectMember, ProjectRole, ProjectSettings } from '~~/shared/types/project'
+import type { NewProjectInput, Project, ProjectMember, ProjectRole, ProjectSettings } from '~~/shared/types/project'
 import type { User } from '~~/shared/types/user'
 
 /** Membro di progetto arricchito con i dati utente (join lato client). */
@@ -63,8 +63,20 @@ export const useProjectsStore = defineStore('projects', () => {
   )
 
   const dailyRateOf = computed(() => (projectId: number) =>
-    settings.value.find(s => s.project_id === projectId)?.daily_rate ?? 400,
+    settings.value.find(s => s.project_id === projectId)?.daily_rate ?? DEFAULT_DAILY_RATE,
   )
+
+  /**
+   * Crea un progetto e aggiorna lo stato con progetto, membership ADMIN
+   * di chi lo ha creato e impostazioni, così la UI è coerente senza refetch.
+   */
+  async function createProject(input: NewProjectInput, ownerId: number) {
+    const created = await projectsService.createProject(input, ownerId)
+    projects.value.push(created.project)
+    members.value.push(created.member)
+    settings.value.push(created.settings)
+    return created.project
+  }
 
   async function updateMemberRole(memberId: number, role: ProjectRole) {
     const updated = await projectsService.updateMemberRole(memberId, role)
@@ -100,6 +112,7 @@ export const useProjectsStore = defineStore('projects', () => {
     clientsOf,
     availableOperators,
     dailyRateOf,
+    createProject,
     updateMemberRole,
     addOperator,
     setDailyRate,

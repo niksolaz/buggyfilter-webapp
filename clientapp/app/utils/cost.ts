@@ -11,6 +11,9 @@ export const HOURS_PER_DAY = 8
 /** Fallback per i ticket senza stima, così i totali restano coerenti. */
 export const DEFAULT_ESTIMATED_HOURS = 4
 
+/** Tariffa giornaliera proposta ai nuovi progetti e usata come fallback (EUR). */
+export const DEFAULT_DAILY_RATE = 400
+
 /** Costo stimato di un singolo ticket data la tariffa giornaliera (EUR). */
 export function ticketCost(ticket: OperatorTicket, dailyRate: number): number {
   const hours = ticket.estimated_hours ?? DEFAULT_ESTIMATED_HOURS
