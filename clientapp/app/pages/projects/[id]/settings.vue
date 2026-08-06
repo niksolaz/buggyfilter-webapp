@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ProjectRole } from '~~/shared/types/project'
+import type { MemberWithUser } from '~/stores/projects'
 
 /**
  * Impostazioni di progetto: inviti clienti via link, gestione del team
@@ -15,10 +16,13 @@ definePageMeta({
 const route = useRoute()
 const projectId = computed(() => Number(route.params.id))
 
+const auth = useAuthStore()
 const projectsStore = useProjectsStore()
+const ticketsStore = useTicketsStore()
 const toast = useToast()
 
-await projectsStore.fetchAll()
+// I ticket servono a bloccare la rimozione di clienti con segnalazioni aperte.
+await Promise.all([projectsStore.fetchAll(), ticketsStore.fetchAll()])
 
 const project = computed(() => projectsStore.projectById(projectId.value))
 useHead({ title: () => project.value ? `${project.value.name} · Impostazioni` : 'Impostazioni' })
@@ -77,6 +81,37 @@ async function addOperator() {
   }
   finally {
     addingOperator.value = false
+  }
+}
+
+// ── Rimozione membri ───────────────────────────────────────────────────
+/** Membro in attesa di conferma; null = modale chiusa. */
+const memberToRemove = ref<MemberWithUser | null>(null)
+const removing = ref(false)
+
+/** null se rimovibile, altrimenti il motivo del blocco (tooltip). */
+function blockReason(member: MemberWithUser) {
+  return auth.user ? projectsStore.removalBlockReason(member, auth.user.id) : 'Sessione non valida'
+}
+
+async function confirmRemove() {
+  const member = memberToRemove.value
+  if (!member || !auth.user) return
+  removing.value = true
+  try {
+    await projectsStore.removeMember(member.id, auth.user.id)
+    toast.add({
+      title: `${fullName(member.user)} non fa più parte del progetto`,
+      color: 'success',
+      icon: 'i-lucide-user-minus',
+    })
+    memberToRemove.value = null
+  }
+  catch (e) {
+    toast.add({ title: e instanceof Error ? e.message : 'Errore', color: 'error', icon: 'i-lucide-alert-circle' })
+  }
+  finally {
+    removing.value = false
   }
 }
 
@@ -153,8 +188,11 @@ async function saveRate() {
               <th class="pb-2 pr-4 font-semibold">
                 Tipo
               </th>
-              <th class="pb-2 font-semibold">
+              <th class="pb-2 pr-4 font-semibold">
                 Ruolo nel progetto
+              </th>
+              <th class="pb-2 text-right font-semibold">
+                <span class="sr-only">Azioni</span>
               </th>
             </tr>
           </thead>
@@ -189,7 +227,7 @@ async function saveRate() {
                   {{ member.user.role === 'CLIENT' ? 'Cliente' : member.user.role === 'OWNER' ? 'Owner' : 'Operatore' }}
                 </UBadge>
               </td>
-              <td class="py-3">
+              <td class="py-3 pr-4">
                 <USelect
                   :model-value="member.role_in_project"
                   :items="roleOptions"
@@ -198,6 +236,19 @@ async function saveRate() {
                   :aria-label="`Ruolo di ${fullName(member.user)} nel progetto`"
                   @update:model-value="value => changeRole(member.id, value as ProjectRole)"
                 />
+              </td>
+              <td class="py-3 text-right">
+                <UTooltip :text="blockReason(member) ?? 'Rimuovi dal progetto'">
+                  <UButton
+                    icon="i-lucide-user-minus"
+                    color="error"
+                    variant="ghost"
+                    size="sm"
+                    :disabled="blockReason(member) !== null"
+                    :aria-label="`Rimuovi ${fullName(member.user)} dal progetto`"
+                    @click="memberToRemove = member"
+                  />
+                </UTooltip>
               </td>
             </tr>
           </tbody>
@@ -260,6 +311,35 @@ async function saveRate() {
         </div>
       </section>
     </div>
+
+    <!-- Conferma rimozione: azione distruttiva, mai in un click solo -->
+    <UModal
+      :open="memberToRemove !== null"
+      title="Rimuovere dal progetto?"
+      :description="memberToRemove
+        ? `${fullName(memberToRemove.user)} perderà l'accesso a ${project.name}. Puoi aggiungere di nuovo questa persona in qualsiasi momento.`
+        : ''"
+      @update:open="value => { if (!value) memberToRemove = null }"
+    >
+      <template #footer>
+        <div class="flex w-full justify-end gap-2">
+          <UButton
+            label="Annulla"
+            color="neutral"
+            variant="ghost"
+            :disabled="removing"
+            @click="memberToRemove = null"
+          />
+          <UButton
+            label="Rimuovi"
+            color="error"
+            icon="i-lucide-user-minus"
+            :loading="removing"
+            @click="confirmRemove"
+          />
+        </div>
+      </template>
+    </UModal>
   </div>
 
   <BfEmptyState

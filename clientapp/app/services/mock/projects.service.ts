@@ -1,5 +1,6 @@
 import { fakeLatency } from './delay'
 import { projects, projectMembers, projectSettings } from '~/mocks/projects'
+import { tickets } from '~/mocks/tickets'
 import { users } from '~/mocks/users'
 import type { NewProjectInput, Project, ProjectMember, ProjectRole, ProjectSettings } from '~~/shared/types/project'
 import type { User } from '~~/shared/types/user'
@@ -104,6 +105,46 @@ export async function addMember(projectId: number, userId: number, role: Project
   }
   projectMembers.push(member)
   return { ...member }
+}
+
+/**
+ * Rimuove un membro dal progetto. Le tre guardie qui sotto sono la fonte
+ * di verità (il backend dovrà replicarle): la UI le duplica solo per
+ * disabilitare il pulsante e spiegare il perché.
+ */
+export async function removeMember(memberId: number, requesterId: number): Promise<void> {
+  await fakeLatency()
+
+  const member = projectMembers.find(m => m.id === memberId)
+  if (!member) throw new Error('Membro non trovato')
+
+  if (member.user_id === requesterId) {
+    throw new Error('Non puoi rimuovere te stesso dal progetto')
+  }
+
+  if (member.role_in_project === 'ADMIN') {
+    const admins = projectMembers.filter(
+      m => m.project_id === member.project_id && m.role_in_project === 'ADMIN',
+    )
+    if (admins.length === 1) {
+      throw new Error('Il progetto deve avere almeno un admin')
+    }
+  }
+
+  // Un cliente con segnalazioni ancora aperte non va tagliato fuori:
+  // perderebbe l'accesso a lavoro in corso. Lo storico risolto non blocca.
+  const openTickets = tickets.filter(
+    t => t.project_id === member.project_id && t.client_id === member.user_id && t.status !== 'DONE',
+  )
+  if (openTickets.length) {
+    throw new Error(
+      openTickets.length === 1
+        ? 'Ha 1 ticket ancora aperto: va chiuso prima della rimozione'
+        : `Ha ${openTickets.length} ticket ancora aperti: vanno chiusi prima della rimozione`,
+    )
+  }
+
+  projectMembers.splice(projectMembers.indexOf(member), 1)
 }
 
 export async function updateDailyRate(projectId: number, dailyRate: number): Promise<ProjectSettings> {
