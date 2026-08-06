@@ -89,6 +89,44 @@ export const useProjectsStore = defineStore('projects', () => {
     members.value.push(member)
   }
 
+  /** Ticket non ancora risolti aperti da un utente in un progetto. */
+  const openTicketsOfClient = computed(() => (projectId: number, userId: number) =>
+    useTicketsStore().tickets.filter(
+      t => t.project_id === projectId && t.client_id === userId && t.status !== 'DONE',
+    ).length,
+  )
+
+  /**
+   * Motivo per cui un membro NON è rimovibile, o null se lo è.
+   * Serve solo ad affordance (bottone disabilitato + tooltip): le stesse
+   * regole sono applicate — e fanno fede — in projectsService.removeMember.
+   * Richiede che lo store ticket sia già stato caricato.
+   */
+  const removalBlockReason = computed(() => (member: ProjectMember, requesterId: number): string | null => {
+    if (member.user_id === requesterId) {
+      return 'Non puoi rimuovere te stesso dal progetto'
+    }
+    if (member.role_in_project === 'ADMIN') {
+      const admins = members.value.filter(
+        m => m.project_id === member.project_id && m.role_in_project === 'ADMIN',
+      )
+      if (admins.length === 1) return 'Il progetto deve avere almeno un admin'
+    }
+    const open = openTicketsOfClient.value(member.project_id, member.user_id)
+    if (open) {
+      return open === 1
+        ? 'Ha 1 ticket ancora aperto: va chiuso prima della rimozione'
+        : `Ha ${open} ticket ancora aperti: vanno chiusi prima della rimozione`
+    }
+    return null
+  })
+
+  async function removeMember(memberId: number, requesterId: number) {
+    await projectsService.removeMember(memberId, requesterId)
+    const idx = members.value.findIndex(m => m.id === memberId)
+    if (idx !== -1) members.value.splice(idx, 1)
+  }
+
   async function setDailyRate(projectId: number, rate: number) {
     const updated = await projectsService.updateDailyRate(projectId, rate)
     const idx = settings.value.findIndex(s => s.project_id === projectId)
@@ -112,8 +150,10 @@ export const useProjectsStore = defineStore('projects', () => {
     clientsOf,
     availableOperators,
     dailyRateOf,
+    removalBlockReason,
     createProject,
     updateMemberRole,
+    removeMember,
     addOperator,
     setDailyRate,
     createInviteLink,
