@@ -14,20 +14,42 @@ const projectsStore = useProjectsStore()
 const ticketsStore = useTicketsStore()
 
 await Promise.all([projectsStore.fetchAll(), ticketsStore.fetchAll()])
+
+/** Modale di creazione: il form si rimonta a ogni apertura (campi puliti). */
+const createOpen = ref(false)
+
+function onCreated(projectId: number) {
+  createOpen.value = false
+  navigateTo(`/projects/${projectId}`)
+}
 </script>
 
 <template>
   <div>
-    <h1 class="mb-6 text-xl font-bold text-[var(--color-text)]">
-      I tuoi progetti
-    </h1>
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <h1 class="text-xl font-bold text-[var(--color-text)]">
+        I tuoi progetti
+      </h1>
+      <UButton
+        label="Nuovo progetto"
+        icon="i-lucide-plus"
+        @click="createOpen = true"
+      />
+    </div>
 
     <BfEmptyState
       v-if="!projectsStore.projects.length"
       icon="i-lucide-folder-open"
       title="Nessun progetto"
-      description="I progetti a cui verrai aggiunto compariranno qui."
-    />
+      description="Crea il primo progetto per iniziare a raccogliere le segnalazioni dei clienti."
+    >
+      <UButton
+        label="Nuovo progetto"
+        icon="i-lucide-plus"
+        size="sm"
+        @click="createOpen = true"
+      />
+    </BfEmptyState>
 
     <div
       v-else
@@ -85,5 +107,20 @@ await Promise.all([projectsStore.fetchAll(), ticketsStore.fetchAll()])
         </div>
       </NuxtLink>
     </div>
+
+    <!-- Creazione progetto: chi lo crea ne diventa ADMIN -->
+    <UModal
+      v-model:open="createOpen"
+      title="Nuovo progetto"
+      description="Imposta le informazioni di base. Potrai invitare clienti e operatori dalle impostazioni."
+    >
+      <template #body>
+        <BfProjectForm
+          v-if="createOpen"
+          @created="onCreated"
+          @cancel="createOpen = false"
+        />
+      </template>
+    </UModal>
   </div>
 </template>
