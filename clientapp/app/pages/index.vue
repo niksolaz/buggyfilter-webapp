@@ -1,11 +1,13 @@
 <script setup lang="ts">
-/** Root: smista alla home del ruolo (il middleware globale gestisce i non autenticati). */
-definePageMeta({ layout: false })
+/** Pagina pubblica iniziale: nessun redirect automatico al login. */
+definePageMeta({ layout: "default" });
 
-const auth = useAuthStore()
-await navigateTo(auth.homePath, { replace: true })
+const name = inject("currentView") as Ref<string>;
 </script>
 
 <template>
-  <div />
+  <div>
+    <BlockpageHome v-if="name === 'home'" />
+    <BlockpagePricing v-else />
+  </div>
 </template>
