@@ -4,18 +4,23 @@
  * - non autenticato → /login (tranne le pagine pubbliche)
  * - già autenticato su una pagina pubblica → home del proprio ruolo
  */
-const PUBLIC_PATHS = ['/login', '/register']
+const PUBLIC_PATHS = ["/", "/pricing", "/login", "/register"];
 
 export default defineNuxtRouteMiddleware((to) => {
-  const auth = useAuthStore()
-  auth.restore()
+  const auth = useAuthStore();
+  auth.restore();
 
-  const isPublic = PUBLIC_PATHS.includes(to.path)
+  const isPublic = PUBLIC_PATHS.includes(to.path);
 
   if (!auth.isAuthenticated && !isPublic) {
-    return navigateTo('/login')
+    return navigateTo("/login");
   }
-  if (auth.isAuthenticated && isPublic) {
-    return navigateTo(auth.homePath)
+  if (
+    auth.isAuthenticated &&
+    isPublic &&
+    to.path !== "/" &&
+    to.path !== "/pricing"
+  ) {
+    return navigateTo(auth.homePath);
   }
-})
+});
