@@ -11,8 +11,9 @@ export default defineNuxtConfig({
   app: {
     head: {
       link: [
-        // Favicon servita da public/favicon.ico
+        // Fallback per browser che richiedono il formato ICO.
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
       ],
     },
   },
