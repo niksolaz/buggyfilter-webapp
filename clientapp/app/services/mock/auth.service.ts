@@ -15,6 +15,7 @@ export interface RegisterInput {
   password: string
   phone: string
   location: string
+  plan: 'basic' | 'standard' | 'pro'
 }
 
 export async function login(email: string, password: string): Promise<User> {
